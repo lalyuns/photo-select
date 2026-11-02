@@ -1,0 +1,15 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+}
+.panel {
+  width: min(740px, 100%);
+  display: grid;
+  gap: 20px;
+  padding: 28px;
+}
+.tag { margin: 0; font-size: var(--text-sm); color: var(--ink-subtle); }
+.title { margin: 0; font-size: var(--text-xl); }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }

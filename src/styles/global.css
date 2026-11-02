@@ -16,7 +16,6 @@ button { font: inherit; color: inherit; }
 .glass {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--line);
 }
 
@@ -24,7 +23,6 @@ button { font: inherit; color: inherit; }
 .glass-panel {
   background: var(--panel-bg);
   backdrop-filter: blur(var(--panel-blur));
-  -webkit-backdrop-filter: blur(var(--panel-blur));
   border: 1px solid var(--line);
   border-radius: var(--radius-panel);
 }

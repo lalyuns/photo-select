@@ -1,5 +1,5 @@
 // App 裡所有資料的「長相」。只有型別，沒有邏輯。
-import type { PhotoEntry } from './source'
+import type { PhotoEntry, PhotoSource } from './source'
 
 /** 目前顯示哪個畫面（對應設計稿 A 選資料夾、B 設定、C 整理、D 檢查、完成） */
 export type Screen = 'start' | 'setup' | 'sort' | 'review' | 'done'
@@ -31,6 +31,8 @@ export interface HistoryEntry {
 /** 整個 App 的狀態 */
 export interface AppState {
   screen: Screen
+  /** 目前這批照片的來源（示範相冊或真資料夾）；不會存進瀏覽器 */
+  source: PhotoSource | null
   /** 相冊名稱，顯示在左上角 */
   sourceLabel: string
   photos: PhotoEntry[]

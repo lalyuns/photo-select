@@ -1,9 +1,9 @@
 // 全 App 共用的狀態倉庫：資料放這裡，改資料的動作也放這裡。
 import { create } from 'zustand'
-import type { PhotoEntry } from '../types/source'
+import type { PhotoEntry, PhotoSource } from '../types/source'
 import type { AppState, Category, Screen } from '../types/model'
 
-// 顏色先用接近設計稿的值，0-5 會換成從 Figma 抽出的精確色碼
+// 預設三類；顏色來自 Figma 色點
 const DEFAULT_CATEGORIES: Category[] = [
   { id: 'keep', name: '保留', key: 'Digit1', color: '#28B946', folderName: '保留' },
   { id: 'delete', name: '刪除', key: 'Digit2', color: '#FF3B30', folderName: '待刪除' },
@@ -16,7 +16,7 @@ const clamp = (n: number, max: number) => Math.max(0, Math.min(n, max))
 interface AppActions {
   goTo(screen: Screen): void
   /** 載入一批新照片，清空之前的分類與撤回紀錄 */
-  loadPhotos(label: string, photos: PhotoEntry[]): void
+  loadPhotos(source: PhotoSource, photos: PhotoEntry[]): void
   setCategories(categories: Category[]): void
   /** 把目前這張分到某類，並跳下一張 */
   assign(categoryId: string): void
@@ -32,6 +32,7 @@ interface AppActions {
 export const useAppStore = create<AppState & AppActions>()((set, get) => ({
   // ---- 初始狀態 ----
   screen: 'start',
+  source: null,
   sourceLabel: '',
   photos: [],
   categories: DEFAULT_CATEGORIES,
@@ -42,8 +43,8 @@ export const useAppStore = create<AppState & AppActions>()((set, get) => ({
   // ---- 動作 ----
   goTo: (screen) => set({ screen }),
 
-  loadPhotos: (label, photos) =>
-    set({ sourceLabel: label, photos, assignments: {}, history: [], cursor: 0 }),
+  loadPhotos: (source, photos) =>
+    set({ source, sourceLabel: source.label, photos, assignments: {}, history: [], cursor: 0 }),
 
   setCategories: (categories) => set({ categories }),
 

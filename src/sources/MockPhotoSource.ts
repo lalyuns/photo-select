@@ -1,6 +1,6 @@
 // PhotoSource 的示範版：從 public/demo/ 讀照片，不碰使用者的檔案。
 import type { PhotoEntry, PhotoSource, ScanResult } from '../types/source'
-import type { DemoAlbum } from './demoAlbums'
+import { demoUrl, type DemoAlbum } from './demoAlbums'
 import { summarizeNames } from './fileNames'
 
 export function createMockPhotoSource(album: DemoAlbum): PhotoSource {
@@ -19,8 +19,7 @@ export function createMockPhotoSource(album: DemoAlbum): PhotoSource {
     },
 
     async getFile(id: string): Promise<File> {
-      // BASE_URL 是 vite.config.ts 的 base，也就是 '/photo-select/'
-      const res = await fetch(`${import.meta.env.BASE_URL}demo/${id}`)
+      const res = await fetch(demoUrl(id))
       if (!res.ok) throw new Error(`找不到示範照片 public/demo/${id}`)
       const blob = await res.blob()
       return new File([blob], id, { type: blob.type })

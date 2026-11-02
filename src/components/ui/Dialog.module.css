@@ -1,0 +1,43 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(28, 28, 32, 0.12);
+  /* 背後的畫面先模糊。注意：不要在這層做 opacity 動畫，會讓面板的毛玻璃失效 */
+  backdrop-filter: blur(8px);
+}
+
+.panel {
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 28px;
+  animation: rise 0.18s ease-out;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-xl);
+  line-height: 1.45;
+}
+
+.body {
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--ink-strong);
+}
+.body p { margin: 0; }
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(8px) scale(0.98); } }

@@ -1,0 +1,26 @@
+.root {
+  position: relative;
+  min-height: 100%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #eadfe6, #dde6ee);
+}
+
+/* 照片比畫面大一圈再模糊，邊緣才不會露出白邊（Figma 也是往外延伸 150px） */
+.photo {
+  position: absolute;
+  inset: -150px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(var(--ambient-blur));
+}
+
+.veil {
+  position: absolute;
+  inset: 0;
+  background: var(--ambient-veil);
+}
+
+.content {
+  position: relative;
+  min-height: 100vh;
+}
