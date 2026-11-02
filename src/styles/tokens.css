@@ -1,0 +1,56 @@
+/* 設計 tokens：數值全部來自 Figma「MVP v1｜互動原型」。
+   Figma 的模糊值 ÷ 2 ≈ CSS 的 blur。 */
+:root {
+  /* 字體 */
+  --font-sans: 'Noto Sans TC', -apple-system, 'PingFang TC', sans-serif;
+
+  /* 文字色：墨色 #1C1C20 的不同透明度 */
+  --ink: #1c1c20;
+  --ink-strong: rgba(28, 28, 32, 0.94); /* 主要文字 */
+  --ink-muted: rgba(28, 28, 32, 0.7);   /* 次要文字，例如「放大」 */
+  --ink-subtle: rgba(28, 28, 32, 0.5);  /* 說明文字，例如「設定可沿用到下一組照片。」 */
+  --on-ink: #ffffff;                    /* 深色按鈕上的字 */
+
+  /* 填色與邊線 */
+  --line: rgba(28, 28, 32, 0.1);
+  --fill-button: rgba(28, 28, 32, 0.06); /* 次要按鈕 */
+  --fill-field: rgba(28, 28, 32, 0.05);  /* 設定表格的欄位 */
+  --fill-keycap: rgba(28, 28, 32, 0.1);  /* 按鍵小方塊 */
+  --fill-note: rgba(28, 28, 32, 0.04);   /* 按鍵規則說明區 */
+  --fill-input: #f0f0f2;                 /* 對話框裡的輸入欄 */
+
+  /* 毛玻璃 */
+  --glass-bg: rgba(255, 255, 255, 0.55); /* 工具列、托盤、狀態提示、相冊卡 */
+  --glass-blur: 14px;
+  --panel-bg: rgba(255, 255, 255, 0.8);  /* 設定面板、檢查面板、對話框 */
+  --panel-blur: 25px;
+  --card-bg: rgba(255, 255, 255, 0.75);  /* 檢查畫面的照片卡 */
+
+  /* 背景 */
+  --ambient-blur: 45px;                     /* 背景照片的模糊 */
+  --ambient-veil: rgba(255, 255, 255, 0.5); /* 背景上的白色淡化 */
+
+  /* 圓角 */
+  --radius-pill: 999px;
+  --radius-panel: 26px;
+  --radius-tray: 22px;
+  --radius-card: 18px;
+  --radius-chip: 17px;
+  --radius-photo: 14px;
+  --radius-thumb: 12px;
+  --radius-field: 10px;
+  --radius-keycap: 6px;
+  --radius-progress: 2px;
+
+  /* 陰影 */
+  --shadow-photo: 0 30px 80px rgba(0, 0, 0, 0.25);
+
+  /* 字級 */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-hero: 52px;
+}

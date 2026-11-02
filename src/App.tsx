@@ -1,122 +1,68 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+// 暫時的元件展示頁：用來確認 0-5 的樣式跟 Figma 一致。
+// 之後會換成依 screen 切換 A／B／C／D 畫面。
+import { Button } from './components/ui/Button'
+import { Keycap } from './components/ui/Keycap'
+import { glowOf } from './config/categoryColors'
+import { useAppStore } from './store/useAppStore'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const categories = useAppStore((s) => s.categories)
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <main
+      style={{
+        minHeight: '100%',
+        display: 'grid',
+        placeItems: 'center',
+        padding: 40,
+        background: 'linear-gradient(135deg, #eadfe6, #dde6ee)',
+      }}
+    >
+      <div className="glass-panel" style={{ padding: 28, display: 'grid', gap: 24, maxWidth: 740 }}>
+        <h1 style={{ margin: 0, fontSize: 'var(--text-xl)' }}>元件展示</h1>
+
+        <section style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+          <Button variant="primary">開始整理</Button>
+          <Button size="md">返回</Button>
+          <Button variant="primary" size="sm">檢查結果</Button>
+          <Button variant="ghost" size="sm">分類設定</Button>
+          <Button variant="ghost" size="sm" disabled>
+            撤回 <Keycap code="KeyZ" label="⌘Z" />
+          </Button>
+        </section>
+
+        <nav
+          className="glass"
+          style={{ display: 'flex', gap: 4, padding: 5, borderRadius: 'var(--radius-tray)', width: 'fit-content' }}
         >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+          {categories.map((c) => (
+            <span
+              key={c.id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 9,
+                minHeight: 42,
+                padding: '0 16px 0 10px',
+                fontSize: 'var(--text-md)',
+                fontWeight: 700,
+              }}
+            >
+              <i
+                style={{
+                  width: 9,
+                  height: 9,
+                  borderRadius: '50%',
+                  background: c.color,
+                  boxShadow: `0 0 10px ${glowOf(c.color)}B3`,
+                }}
+              />
+              <Keycap code={c.key} />
+              {c.name}
+            </span>
+          ))}
+        </nav>
+      </div>
+    </main>
   )
 }
-
-export default App

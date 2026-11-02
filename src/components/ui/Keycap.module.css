@@ -1,0 +1,15 @@
+.keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 3px 6px;
+  border-radius: var(--radius-keycap);
+  background: var(--fill-keycap);
+  color: var(--ink-strong);
+  font-family: inherit;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  line-height: 1;
+}

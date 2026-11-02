@@ -5,7 +5,7 @@ import type { AppState, Category, Screen } from '../types/model'
 
 // 顏色先用接近設計稿的值，0-5 會換成從 Figma 抽出的精確色碼
 const DEFAULT_CATEGORIES: Category[] = [
-  { id: 'keep', name: '保留', key: 'Digit1', color: '#34C759', folderName: '保留' },
+  { id: 'keep', name: '保留', key: 'Digit1', color: '#28B946', folderName: '保留' },
   { id: 'delete', name: '刪除', key: 'Digit2', color: '#FF3B30', folderName: '待刪除' },
   { id: 'maybe', name: '待考慮', key: 'Digit3', color: '#FF9500', folderName: '待考慮' },
 ]
