@@ -1,0 +1,14 @@
+/* 照 Figma：距頂 6px、左右 16px、線高 3px；畫布 7px 高，讓目前這張可以凸出來 */
+.hit {
+  position: absolute;
+  top: 0;
+  left: 16px;
+  right: 16px;
+  padding: 4px 0 6px;
+  cursor: pointer;
+}
+.line {
+  display: block;
+  width: 100%;
+  height: 7px;
+}

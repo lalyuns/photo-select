@@ -1,0 +1,5 @@
+.keys { display: grid; gap: 10px; margin: 0; }
+.keys div { display: flex; align-items: center; gap: 12px; }
+.keys dt { display: flex; align-items: center; gap: 4px; min-width: 80px; font-size: var(--text-sm); color: var(--ink-subtle); }
+.keys dd { margin: 0; }
+.note { margin-top: 14px !important; font-size: var(--text-sm); color: var(--ink-subtle); }

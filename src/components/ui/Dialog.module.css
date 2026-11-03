@@ -41,3 +41,10 @@
 }
 
 @keyframes rise { from { opacity: 0; transform: translateY(8px) scale(0.98); } }
+
+/* 放大照片：Figma「放大｜照片」 */
+.wide {
+  width: min(1220px, 100%);
+  max-height: calc(100vh - 32px);
+}
+.wide .body { width: 100%; min-height: 0; }

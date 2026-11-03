@@ -2,10 +2,10 @@
 // 「選擇照片資料夾」用 Chrome 讀取本機資料夾；不支援的瀏覽器改提示用示範照片。
 import { useEffect, useState } from 'react'
 import { Ambient } from '../components/Ambient'
+import { HelpDialog } from '../components/HelpDialog'
 import { Button } from '../components/ui/Button'
 import { Dialog } from '../components/ui/Dialog'
 import { Icon } from '../components/ui/Icon'
-import { Keycap } from '../components/ui/Keycap'
 import { DEMO_ALBUMS, demoUrl, type DemoAlbum } from '../sources/demoAlbums'
 import { createDirectoryPhotoSource } from '../sources/DirectoryPhotoSource'
 import { formatUnsupported } from '../sources/fileNames'
@@ -23,7 +23,6 @@ interface AlbumCard {
 type OpenDialog = 'local' | 'unsupported' | 'error' | 'help' | null
 
 export function StartScreen() {
-  const categories = useAppStore((s) => s.categories)
   const [cards, setCards] = useState<AlbumCard[]>([])
   const [dialog, setDialog] = useState<OpenDialog>(null)
   /** 對話框裡的補充說明，例如「HEIC 3 個、RAW 4 個」或錯誤訊息 */
@@ -168,26 +167,7 @@ export function StartScreen() {
         <p>{detail}</p>
       </Dialog>
 
-      {/* Figma「說明｜快捷鍵與原型範圍」；分類鍵依目前設定產生 */}
-      <Dialog
-        open={dialog === 'help'}
-        title="快速整理"
-        onClose={() => setDialog(null)}
-        actions={<Button onClick={() => setDialog(null)}>關閉</Button>}
-      >
-        <dl className={styles.keys}>
-          {categories.map((c) => (
-            <div key={c.id}>
-              <dt><Keycap code={c.key} /></dt>
-              <dd>{c.name}</dd>
-            </div>
-          ))}
-          <div><dt><Keycap code="ArrowLeft" /> <Keycap code="ArrowRight" /></dt><dd>切換照片</dd></div>
-          <div><dt><Keycap code="KeyZ" /> 或 <Keycap code="KeyZ" label="⌘Z" /></dt><dd>撤回上一筆</dd></div>
-          <div><dt><Keycap code="Space" /></dt><dd>放大照片</dd></div>
-        </dl>
-        <p className={styles.note}>照片只在你的電腦上處理，不會上傳。</p>
-      </Dialog>
+      <HelpDialog open={dialog === 'help'} onClose={() => setDialog(null)} />
     </Ambient>
   )
 }
