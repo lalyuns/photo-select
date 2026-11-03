@@ -5,6 +5,7 @@ import { planArchive, runArchive, type ArchiveJob, type ArchiveProgress, type Ar
 import { createDirectoryArchiveTarget } from '../sources/DirectoryArchiveTarget'
 import { isSameOrInside, pickDirectory, supportsFolderAccess } from '../sources/fsAccess'
 import { createMockArchiveTarget } from '../sources/MockArchiveTarget'
+import { logEvent } from '../research/eventLog'
 import { useAppStore } from '../store/useAppStore'
 import type { ArchiveSummary } from '../types/model'
 import type { ArchiveTarget } from '../types/source'
@@ -36,6 +37,7 @@ export function useArchiveFlow() {
     }
     try {
       const dir = await pickDirectory('archive')
+      logEvent('picker', { purpose: 'archive', result: dir ? 'granted' : 'cancelled' })
       if (!dir) {
         setPhase('idle') // 使用者按了取消
         return
@@ -48,6 +50,7 @@ export function useArchiveFlow() {
       }
       return run()
     } catch (e) {
+      logEvent('picker', { purpose: 'archive', result: 'error' })
       setError(e instanceof Error ? e.message : String(e))
       setPhase('error')
     }
@@ -82,6 +85,7 @@ export function useArchiveFlow() {
     })
     setSummary(next)
     setArchiveResult(next)
+    logEvent('archive', { copied: next.copied, failed: next.failed.length, simulated: next.simulated, stopped: next.stopped })
     if (result.failed.length > 0) setPhase('failed')
     else {
       setPhase('idle')

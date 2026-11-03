@@ -10,7 +10,9 @@ import { DEMO_ALBUMS, demoUrl, type DemoAlbum } from '../sources/demoAlbums'
 import { createDirectoryPhotoSource } from '../sources/DirectoryPhotoSource'
 import { formatUnsupported } from '../sources/fileNames'
 import { pickDirectory, supportsFolderAccess } from '../sources/fsAccess'
+import { clearProgress, loadProgress, type SavedProgress } from '../sources/progress'
 import { createMockPhotoSource } from '../sources/MockPhotoSource'
+import { logEvent } from '../research/eventLog'
 import { useAppStore } from '../store/useAppStore'
 import styles from './StartScreen.module.css'
 
@@ -28,6 +30,12 @@ export function StartScreen() {
   /** 對話框裡的補充說明，例如「HEIC 3 個、RAW 4 個」或錯誤訊息 */
   const [detail, setDetail] = useState('')
   const [scanning, setScanning] = useState(false)
+  /** 上次整理到一半的進度（企劃 M4） */
+  const [saved, setSaved] = useState<SavedProgress | null>(null)
+
+  useEffect(() => {
+    loadProgress().then((p) => p && setSaved(p))
+  }, [])
 
   // 掃描每個示範相冊，算出張數
   useEffect(() => {
@@ -39,6 +47,48 @@ export function StartScreen() {
       }),
     ).then(setCards)
   }, [])
+
+  // 接續上次：重新選同一個資料夾 → 掃描 → 只還原「同一張照片」的分類
+  async function resume(progress: SavedProgress) {
+    try {
+      let source
+      if (progress.kind === 'folder') {
+        if (!supportsFolderAccess()) {
+          setDialog('local')
+          return
+        }
+        const dir = await pickDirectory('source')
+        logEvent('picker', { purpose: 'source', result: dir ? 'granted' : 'cancelled', resume: true })
+        if (!dir) return
+        source = createDirectoryPhotoSource(dir)
+      } else {
+        const album = DEMO_ALBUMS.find((a) => a.id === progress.albumId)
+        if (!album) throw new Error('找不到上次的示範相冊')
+        source = createMockPhotoSource(album)
+      }
+      setScanning(true)
+      const { photos, unsupported } = await source.scan()
+      const same = new Map(photos.map((p) => [p.id, `${p.size}:${p.lastModified}`]))
+      // 檔名一樣但大小或修改時間不同，代表已經換成別的照片，不還原
+      const kept = Object.fromEntries(
+        Object.entries(progress.assignments).filter(([id]) => same.get(id) === progress.fingerprints[id]),
+      )
+      if (Object.keys(kept).length === 0) {
+        setDetail(`「${source.label}」裡找不到上次分過的照片，可能選錯資料夾了（上次是「${progress.label}」）。`)
+        setDialog('error')
+        return
+      }
+      const { loadPhotos, restoreProgress, goTo } = useAppStore.getState()
+      loadPhotos(source, photos, unsupported)
+      restoreProgress(kept, progress.cursor)
+      goTo('sort')
+    } catch (e) {
+      setDetail(e instanceof Error ? e.message : String(e))
+      setDialog('error')
+    } finally {
+      setScanning(false)
+    }
+  }
 
   async function openAlbum(album: DemoAlbum) {
     const source = createMockPhotoSource(album)
@@ -56,11 +106,14 @@ export function StartScreen() {
   // 選本機資料夾 → 掃描 → 進入分類設定
   async function openFolder() {
     if (!supportsFolderAccess()) {
+      logEvent('picker', { purpose: 'source', result: 'unsupported' })
       setDialog('local')
       return
     }
     try {
       const dir = await pickDirectory('source')
+      // H5：使用者願不願意授權
+      logEvent('picker', { purpose: 'source', result: dir ? 'granted' : 'cancelled' })
       if (!dir) return // 使用者按了取消
       setScanning(true)
       const source = createDirectoryPhotoSource(dir)
@@ -74,6 +127,7 @@ export function StartScreen() {
       loadPhotos(source, photos, unsupported)
       goTo('setup')
     } catch (e) {
+      logEvent('picker', { purpose: 'source', result: 'error' })
       setDetail(e instanceof Error ? e.message : String(e))
       setDialog('error')
     } finally {
@@ -101,6 +155,17 @@ export function StartScreen() {
           <b>照片留在本機，免上傳。</b>
           <span>只讀取你選的資料夾；歸檔時另存複本，原檔不動。</span>
         </p>
+
+        {saved && (
+          <div className={`glass ${styles.resume}`} role="region" aria-label="上次的進度">
+            <span>
+              <b>上次整理到一半：「{saved.label}」</b>
+              已分 {saved.assigned} / {saved.photoCount} 張{saved.kind === 'folder' ? '（會請你再選一次這個資料夾）' : ''}・{new Date(saved.savedAt).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+            </span>
+            <Button variant="primary" size="md" onClick={() => resume(saved)} disabled={scanning}>繼續整理</Button>
+            <Button variant="ghost" size="md" onClick={() => { void clearProgress(); setSaved(null) }}>不用了</Button>
+          </div>
+        )}
 
         <p className={styles.or}>或選擇示範相冊</p>
 

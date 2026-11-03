@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { findConflict, isAssignable, keyLabel, suggestKey } from '../../config/keys'
 import { useKeyCapture } from '../../hooks/useKeyCapture'
+import { logEvent } from '../../research/eventLog'
 import type { Category } from '../../types/model'
 import { Button } from '../ui/Button'
 import { Dialog } from '../ui/Dialog'
@@ -35,6 +36,7 @@ function AddCategoryForm({ categories, onAdd, onClose }: Omit<Props, 'open'>) {
       }
       const other = findConflict(categories, code)
       if (other) {
+        logEvent('key_conflict', { where: 'add' })
         // Figma「設定｜快捷鍵衝突」：F 已分給「朋友美照」，換成未使用的 G
         setNote(`${keyLabel(code)} 已分給「${other.name}」，先用未使用的 ${keyLabel(key)}。`)
         return

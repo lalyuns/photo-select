@@ -11,6 +11,7 @@ import { Icon } from '../components/ui/Icon'
 import { Keycap } from '../components/ui/Keycap'
 import { resolveKey } from '../config/keys'
 import { usePhotoWindow } from '../hooks/usePhotoWindow'
+import { logEvent } from '../research/eventLog'
 import { useAppStore } from '../store/useAppStore'
 import styles from './SortScreen.module.css'
 
@@ -41,7 +42,10 @@ export function SortScreen() {
   const overlayRef = useRef<Overlay>(null)
   useEffect(() => {
     overlayRef.current = overlay
+    if (overlay === 'zoom') logEvent('zoom')
   }, [overlay])
+  // 照片檔案壞掉、瀏覽器解不開時
+  const [brokenUrl, setBrokenUrl] = useState<string | null>(null)
 
   // 分類並讓托盤上的按鈕閃一下
   function assignWithFeedback(categoryId: string) {
@@ -121,8 +125,8 @@ export function SortScreen() {
 
         {/* 目前照片 */}
         <figure className={styles.stage}>
-          {error ? (
-            <p className={styles.error}>這張讀不到：{error}</p>
+          {error || (url && url === brokenUrl) ? (
+            <p className={styles.error}>這張讀不到：{error ?? '檔案可能已損壞'}。可以照樣分類，或按 → 跳過。</p>
           ) : (
             url && (
               <img
@@ -130,6 +134,7 @@ export function SortScreen() {
                 src={url}
                 alt={current?.name}
                 onDoubleClick={() => setOverlay('zoom')}
+                onError={() => setBrokenUrl(url)}
               />
             )
           )}

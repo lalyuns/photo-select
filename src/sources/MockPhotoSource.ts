@@ -3,9 +3,15 @@ import type { PhotoEntry, PhotoSource, ScanResult } from '../types/source'
 import { demoUrl, type DemoAlbum } from './demoAlbums'
 import { summarizeNames } from './fileNames'
 
-export function createMockPhotoSource(album: DemoAlbum): PhotoSource {
+export interface MockPhotoSource extends PhotoSource {
+  /** 是哪個示範相冊（接續上次進度時用） */
+  readonly albumId: string
+}
+
+export function createMockPhotoSource(album: DemoAlbum): MockPhotoSource {
   return {
     label: album.label,
+    albumId: album.id,
 
     async scan(): Promise<ScanResult> {
       const { supported, unsupported } = summarizeNames(album.files)

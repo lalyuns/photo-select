@@ -109,3 +109,18 @@
   cursor: pointer;
 }
 .help:hover { color: var(--ink-strong); }
+
+/* 上次整理到一半（企劃 M4） */
+.resume {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px 14px;
+  margin: -16px 0 32px;
+  padding: 10px 12px 10px 18px;
+  border-radius: var(--radius-card);
+  text-align: left;
+}
+.resume span { display: grid; font-size: var(--text-sm); color: var(--ink-muted); }
+.resume b { font-size: var(--text-md); color: var(--ink-strong); }

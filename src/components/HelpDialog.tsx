@@ -1,4 +1,6 @@
 // 快捷鍵說明（Figma「說明｜快捷鍵與原型範圍」）。首頁和整理畫面共用；分類鍵依目前設定產生。
+import { useEffect } from 'react'
+import { logEvent } from '../research/eventLog'
 import { useAppStore } from '../store/useAppStore'
 import { Button } from './ui/Button'
 import { Dialog } from './ui/Dialog'
@@ -7,6 +9,10 @@ import styles from './HelpDialog.module.css'
 
 export function HelpDialog({ open, onClose }: { open: boolean; onClose(): void }) {
   const categories = useAppStore((s) => s.categories)
+  // H2：查看對照的次數
+  useEffect(() => {
+    if (open) logEvent('help', { screen: useAppStore.getState().screen })
+  }, [open])
   return (
     <Dialog open={open} title="快速整理" onClose={onClose} actions={<Button onClick={onClose}>關閉</Button>}>
       <dl className={styles.keys}>

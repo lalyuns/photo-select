@@ -12,6 +12,8 @@
 | `src/components/` | 共用大元件（Ambient 背景） |
 | `src/hooks/` | 共用的 React hook（usePhotoUrl） |
 | `src/screens/` | 各畫面，一個畫面一個檔案 |
+| `src/research/` | 事件紀錄、研究模式面板（使用者測試用） |
+| `scripts/` | 開發用的小工具，例如 `npm run test-data` |
 
 ## 畫面分工
 
@@ -42,6 +44,7 @@
 5. 測試用 **Chrome**。Brave 預設關閉檔案存取功能。
 6. CSS **不要手寫 `-webkit-` 前綴**（例如 `-webkit-backdrop-filter`）。打包工具會自動加，手寫反而會讓 Chrome 的版本被刪掉。
 7. 顏色、圓角、字級一律用 `src/styles/tokens.css` 的變數，不寫死數字。
+8. 新功能如果跟 H1～H7 有關，記得用 `logEvent()` 記下來（見 `src/research/eventLog.ts`）。**不要記檔名或資料夾名稱**。
 
 ## 分支與上傳
 

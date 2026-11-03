@@ -2,6 +2,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import type { PhotoEntry, PhotoSource } from '../types/source'
+import { logEvent } from '../research/eventLog'
 import type { AppState, ArchiveSummary, Category, Screen } from '../types/model'
 
 // 預設三類；顏色來自 Figma 色點
@@ -10,6 +11,10 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'delete', name: '刪除', key: 'Digit2', color: '#FF3B30', folderName: '待刪除' },
   { id: 'maybe', name: '待考慮', key: 'Digit3', color: '#FF9500', folderName: '待考慮' },
 ]
+
+/** 不是預設三類的分類有幾個 */
+const countCustom = (categories: Category[]) =>
+  categories.filter((c) => !DEFAULT_CATEGORIES.some((d) => d.id === c.id)).length
 
 /** 把 n 限制在 0 到 max 之間 */
 const clamp = (n: number, max: number) => Math.max(0, Math.min(n, max))
@@ -30,6 +35,8 @@ interface AppActions {
   /** 撤回上一筆分類 */
   undo(): void
   setArchiveResult(summary: ArchiveSummary): void
+  /** 接續上次的進度：只還原這批照片裡還在、而且分類還存在的部分 */
+  restoreProgress(assignments: Record<string, string>, cursor: number): number
   next(): void
   prev(): void
   jumpTo(index: number): void
@@ -52,15 +59,32 @@ export const useAppStore = create<AppState & AppActions>()(
   lastArchive: null,
 
   // ---- 動作 ----
-  goTo: (screen) => set((s) => ({ screen, prevScreen: s.screen })),
+  goTo: (screen) => {
+    const from = get().screen
+    logEvent('screen', { from, to: screen })
+    set({ screen, prevScreen: from })
+  },
 
-  loadPhotos: (source, photos, unsupported = {}) =>
-    set({ source, sourceLabel: source.label, photos, unsupported, assignments: {}, history: [], cursor: 0, lastArchive: null }),
+  loadPhotos: (source, photos, unsupported = {}) => {
+    logEvent('session', { source: 'albumId' in source ? 'demo' : 'folder', photoCount: photos.length, unsupported })
+    set({ source, sourceLabel: source.label, photos, unsupported, assignments: {}, history: [], cursor: 0, lastArchive: null })
+  },
 
   setArchiveResult: (summary) => set({ lastArchive: summary }),
 
+  restoreProgress: (saved, cursor) => {
+    const { photos, categories } = get()
+    const ids = new Set(photos.map((p) => p.id))
+    const alive = new Set(categories.map((c) => c.id))
+    const assignments = Object.fromEntries(Object.entries(saved).filter(([id, c]) => ids.has(id) && alive.has(c)))
+    logEvent('resume', { restored: Object.keys(assignments).length })
+    set({ assignments, history: [], cursor: clamp(cursor, photos.length - 1) })
+    return Object.keys(assignments).length
+  },
+
   setCategories: (categories) => {
     const { assignments, history } = get()
+    logEvent('categories', { count: categories.length, custom: countCustom(categories) })
     const alive = new Set(categories.map((c) => c.id))
     const removed = Object.values(assignments).some((id) => !alive.has(id))
     if (!removed) {
@@ -75,6 +99,13 @@ export const useAppStore = create<AppState & AppActions>()(
     const { photos, cursor, assignments, history } = get()
     const photo = photos[cursor]
     if (!photo) return
+    const { categories } = get()
+    logEvent('assign', {
+      index: cursor,
+      category: categoryId,
+      name: categories.find((c) => c.id === categoryId)?.name,
+      custom: countCustom(categories) > 0, // H7：有自訂分類時還按不按「保留」
+    })
     set({
       assignments: { ...assignments, [photo.id]: categoryId },
       history: [...history, { photoId: photo.id, prev: assignments[photo.id], next: categoryId, cursor }],
@@ -84,6 +115,7 @@ export const useAppStore = create<AppState & AppActions>()(
 
   reassign: (photoId, categoryId) => {
     const { assignments, history, cursor } = get()
+    logEvent('reassign', { from: assignments[photoId] ?? null, to: categoryId })
     set({
       assignments: { ...assignments, [photoId]: categoryId },
       history: [...history, { photoId, prev: assignments[photoId], next: categoryId, cursor }],
@@ -94,6 +126,7 @@ export const useAppStore = create<AppState & AppActions>()(
     const { history, assignments } = get()
     const last = history.at(-1)
     if (!last) return
+    logEvent('undo', { index: last.cursor })
     const restored = { ...assignments }
     if (last.prev === undefined) delete restored[last.photoId]
     else restored[last.photoId] = last.prev

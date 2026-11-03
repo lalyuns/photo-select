@@ -12,6 +12,7 @@ import { glowOf, nextColor, pickColor } from '../config/categoryColors'
 import { findConflict, isAssignable, keyLabel, suggestKey } from '../config/keys'
 import { useKeyCapture } from '../hooks/useKeyCapture'
 import { usePhotoUrl } from '../hooks/usePhotoUrl'
+import { logEvent } from '../research/eventLog'
 import { folderNameError, formatUnsupported } from '../sources/fileNames'
 import { DEFAULT_CATEGORIES, useAppStore } from '../store/useAppStore'
 import type { Category } from '../types/model'
@@ -70,6 +71,7 @@ export function SetupScreen() {
     }
     const other = findConflict(rows, code, row.id)
     if (other) {
+      logEvent('key_conflict', { where: 'row' })
       setConflict({ rowId: row.id, code, other, suggestion: suggestKey(rows, row.id) })
       return
     }

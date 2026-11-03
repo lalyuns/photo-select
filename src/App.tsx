@@ -1,6 +1,8 @@
 // App 的骨架：依 store 裡的 screen 顯示對應畫面。
 // 各軌道只改自己的 src/screens/XxxScreen.tsx，不需要動這個檔案。
 import type { ComponentType } from 'react'
+import { useAutoSave } from './hooks/useAutoSave'
+import { ResearchPanel } from './research/ResearchPanel'
 import { useAppStore } from './store/useAppStore'
 import type { Screen } from './types/model'
 import { DoneScreen } from './screens/DoneScreen'
@@ -19,6 +21,12 @@ const SCREENS: Record<Screen, ComponentType> = {
 
 export default function App() {
   const screen = useAppStore((s) => s.screen)
+  useAutoSave()
   const Current = SCREENS[screen]
-  return <Current />
+  return (
+    <>
+      <Current />
+      <ResearchPanel />
+    </>
+  )
 }
