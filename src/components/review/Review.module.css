@@ -2,6 +2,9 @@
 .page {
   height: 100vh;
   display: grid;
+  /* 列高固定為畫面高度。沒有這行的話，列會被照片格的總高度撐開
+     （2410 張時有 13 萬 px），面板置中後就跑到畫面外面看不到了 */
+  grid-template-rows: minmax(0, 1fr);
   place-items: center;
   padding: 40px 16px;
 }
@@ -9,6 +12,7 @@
 .panel {
   width: min(1184px, 100%);
   height: min(780px, 100%);
+  min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 28px;
