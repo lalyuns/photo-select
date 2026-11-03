@@ -1,10 +1,11 @@
 // 全 App 共用的狀態倉庫：資料放這裡，改資料的動作也放這裡。
 import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import type { PhotoEntry, PhotoSource } from '../types/source'
 import type { AppState, Category, Screen } from '../types/model'
 
 // 預設三類；顏色來自 Figma 色點
-const DEFAULT_CATEGORIES: Category[] = [
+export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'keep', name: '保留', key: 'Digit1', color: '#28B946', folderName: '保留' },
   { id: 'delete', name: '刪除', key: 'Digit2', color: '#FF3B30', folderName: '待刪除' },
   { id: 'maybe', name: '待考慮', key: 'Digit3', color: '#FF9500', folderName: '待考慮' },
@@ -17,6 +18,10 @@ interface AppActions {
   goTo(screen: Screen): void
   /** 載入一批新照片，清空之前的分類與撤回紀錄 */
   loadPhotos(source: PhotoSource, photos: PhotoEntry[], unsupported?: Record<string, number>): void
+  /**
+   * 換成新的分類設定。被移除的分類，已分進去的照片會變回未分類，
+   * 撤回紀錄也會清空（避免撤回到一個不存在的分類）。
+   */
   setCategories(categories: Category[]): void
   /** 把目前這張分到某類，並跳下一張 */
   assign(categoryId: string): void
@@ -29,9 +34,12 @@ interface AppActions {
   jumpTo(index: number): void
 }
 
-export const useAppStore = create<AppState & AppActions>()((set, get) => ({
+export const useAppStore = create<AppState & AppActions>()(
+  persist(
+    (set, get) => ({
   // ---- 初始狀態 ----
   screen: 'start',
+  prevScreen: 'start',
   source: null,
   sourceLabel: '',
   photos: [],
@@ -42,12 +50,22 @@ export const useAppStore = create<AppState & AppActions>()((set, get) => ({
   cursor: 0,
 
   // ---- 動作 ----
-  goTo: (screen) => set({ screen }),
+  goTo: (screen) => set((s) => ({ screen, prevScreen: s.screen })),
 
   loadPhotos: (source, photos, unsupported = {}) =>
     set({ source, sourceLabel: source.label, photos, unsupported, assignments: {}, history: [], cursor: 0 }),
 
-  setCategories: (categories) => set({ categories }),
+  setCategories: (categories) => {
+    const { assignments, history } = get()
+    const alive = new Set(categories.map((c) => c.id))
+    const removed = Object.values(assignments).some((id) => !alive.has(id))
+    if (!removed) {
+      set({ categories })
+      return
+    }
+    const kept = Object.fromEntries(Object.entries(assignments).filter(([, id]) => alive.has(id)))
+    set({ categories, assignments: kept, history: history.length ? [] : history })
+  },
 
   assign: (categoryId) => {
     const { photos, cursor, assignments, history } = get()
@@ -81,4 +99,13 @@ export const useAppStore = create<AppState & AppActions>()((set, get) => ({
   next: () => set((s) => ({ cursor: clamp(s.cursor + 1, s.photos.length - 1) })),
   prev: () => set((s) => ({ cursor: clamp(s.cursor - 1, s.photos.length - 1) })),
   jumpTo: (index) => set((s) => ({ cursor: clamp(index, s.photos.length - 1) })),
-}))
+    }),
+    {
+      // 只把「分類設定」存進瀏覽器，下次打開還在（企劃 C4：設定可沿用）
+      name: 'photo-select:settings',
+      version: 1,
+      storage: createJSONStorage(() => localStorage),
+      partialize: (s) => ({ categories: s.categories }),
+    },
+  ),
+)

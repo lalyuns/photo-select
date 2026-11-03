@@ -1,5 +1,5 @@
 // 共用對話框（Figma 的「說明｜…」「提示｜…」「確認｜…」「放大｜…」）。
-// 開啟時焦點移到第一個按鈕；Esc 關閉；按鍵不會漏到外面的分類快捷鍵。
+// 開啟時焦點移到輸入框或第一個按鈕；Esc 關閉；按鍵不會漏到外面的分類快捷鍵。
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 import styles from './Dialog.module.css'
 
@@ -20,8 +20,12 @@ export function Dialog({ open, title, label, onClose, children, actions, size = 
   const titleId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
 
+  // 打開時把焦點放到標了 data-autofocus 的元素（例如輸入框），沒有就放到第一個按鈕
   useEffect(() => {
-    if (open) panelRef.current?.querySelector<HTMLElement>('button')?.focus()
+    if (!open) return
+    const panel = panelRef.current
+    const target = panel?.querySelector<HTMLElement>('[data-autofocus]') ?? panel?.querySelector<HTMLElement>('button')
+    target?.focus()
   }, [open])
 
   if (!open) return null

@@ -84,3 +84,18 @@ export function resolveKey(e: KeyboardEvent, categories: Category[]): KeyAction 
   const category = categories.find((c) => c.key === code)
   return category ? { type: 'assign', categoryId: category.id } : null
 }
+
+/**
+ * 新增分類時推薦的按鍵：先找左手附近的字母，再找數字。
+ * 例：1、2、3、F、C、T 都用掉了 → 推薦 G（跟 Figma 03 一樣）。
+ */
+const SUGGEST_ORDER = [
+  'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyD', 'KeyS', 'KeyA', 'KeyK', 'KeyL',
+  'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyE', 'KeyW', 'KeyQ', 'KeyI', 'KeyO', 'KeyP',
+  'KeyC', 'KeyV', 'KeyB', 'KeyN', 'KeyM', 'KeyX',
+  'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0',
+]
+
+export function suggestKey(categories: Category[], exceptId?: string): string | undefined {
+  return SUGGEST_ORDER.find((code) => isAssignable(code) && !findConflict(categories, code, exceptId))
+}

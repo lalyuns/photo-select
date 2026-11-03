@@ -20,7 +20,7 @@
 | 檔案 | 畫面 | Figma | 負責 |
 |---|---|---|---|
 | `StartScreen.tsx` | A 開始・選相冊 | 01 | 已完成 |
-| `SetupScreen.tsx` | B 分類設定 | 02、03 | 軌道 C |
+| `SetupScreen.tsx` | B 分類設定 | 02、03 | 已完成（軌道 C） |
 | `SortScreen.tsx` | C 連續整理 | 04～10 | 已完成（軌道 B） |
 | `ReviewScreen.tsx` | D 檢查結果 | 11、12 | 軌道 D |
 | `DoneScreen.tsx` | 完成 | 13 | 軌道 D |

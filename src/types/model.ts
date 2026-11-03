@@ -31,6 +31,8 @@ export interface HistoryEntry {
 /** 整個 App 的狀態 */
 export interface AppState {
   screen: Screen
+  /** 上一個畫面：設定畫面用它判斷是「開始前設定」還是「整理到一半回來改」 */
+  prevScreen: Screen
   /** 目前這批照片的來源（示範相冊或真資料夾）；不會存進瀏覽器 */
   source: PhotoSource | null
   /** 相冊名稱，顯示在左上角 */

@@ -70,3 +70,13 @@ export function formatUnsupported(unsupported: Record<string, number>): string {
     .map(([kind, n]) => `${labels[kind] ?? kind.toUpperCase()} ${n} 個`)
     .join('、')
 }
+
+/** 資料夾名稱有沒有問題；沒問題回傳 null（Mac 和 Windows 都不接受的字元一起擋掉） */
+export function folderNameError(name: string): string | null {
+  const trimmed = name.trim()
+  if (!trimmed) return '資料夾名稱不能空白'
+  if (/[/\\:*?"<>|]/.test(trimmed)) return '資料夾名稱不能有 / \\ : * ? " < > |'
+  if (trimmed.startsWith('.')) return '資料夾名稱不能用 . 開頭'
+  if (trimmed.length > 100) return '資料夾名稱太長'
+  return null
+}
