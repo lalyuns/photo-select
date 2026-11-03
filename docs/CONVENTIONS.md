@@ -22,10 +22,10 @@
 | `StartScreen.tsx` | A 開始・選相冊 | 01 | 已完成 |
 | `SetupScreen.tsx` | B 分類設定 | 02、03 | 已完成（軌道 C） |
 | `SortScreen.tsx` | C 連續整理 | 04～10 | 已完成（軌道 B） |
-| `ReviewScreen.tsx` | D 檢查結果 | 11、12 | 軌道 D |
-| `DoneScreen.tsx` | 完成 | 13 | 軌道 D |
+| `ReviewScreen.tsx` | D 檢查結果 | 11、12 | 已完成（軌道 D） |
+| `DoneScreen.tsx` | 完成 | 13 | 已完成（軌道 D） |
 
-目前 B～完成都是 `Placeholder` 佔位，做正式畫面時整個換掉即可。
+五個畫面都已完成。
 
 ## 命名
 

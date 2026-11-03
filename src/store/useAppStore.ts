@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import type { PhotoEntry, PhotoSource } from '../types/source'
-import type { AppState, Category, Screen } from '../types/model'
+import type { AppState, ArchiveSummary, Category, Screen } from '../types/model'
 
 // 預設三類；顏色來自 Figma 色點
 export const DEFAULT_CATEGORIES: Category[] = [
@@ -29,6 +29,7 @@ interface AppActions {
   reassign(photoId: string, categoryId: string): void
   /** 撤回上一筆分類 */
   undo(): void
+  setArchiveResult(summary: ArchiveSummary): void
   next(): void
   prev(): void
   jumpTo(index: number): void
@@ -48,12 +49,15 @@ export const useAppStore = create<AppState & AppActions>()(
   assignments: {},
   history: [],
   cursor: 0,
+  lastArchive: null,
 
   // ---- 動作 ----
   goTo: (screen) => set((s) => ({ screen, prevScreen: s.screen })),
 
   loadPhotos: (source, photos, unsupported = {}) =>
-    set({ source, sourceLabel: source.label, photos, unsupported, assignments: {}, history: [], cursor: 0 }),
+    set({ source, sourceLabel: source.label, photos, unsupported, assignments: {}, history: [], cursor: 0, lastArchive: null }),
+
+  setArchiveResult: (summary) => set({ lastArchive: summary }),
 
   setCategories: (categories) => {
     const { assignments, history } = get()

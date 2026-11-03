@@ -66,7 +66,7 @@ export async function runArchive(options: {
         result.copied.push({ ...job, savedAs })
       } catch (e) {
         // 一張失敗不影響其他張，最後再列出失敗清單
-        result.failed.push({ ...job, reason: e instanceof Error ? e.message : String(e) })
+        result.failed.push({ ...job, reason: describeError(e) })
       }
       done++
       onProgress?.({ done, total: jobs.length, current: job.photo.name })
@@ -75,4 +75,19 @@ export async function runArchive(options: {
 
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, jobs.length) }, worker))
   return result
+}
+
+/** 把瀏覽器的英文錯誤翻成使用者看得懂的話 */
+export function describeError(e: unknown): string {
+  const name = e instanceof DOMException ? e.name : ''
+  switch (name) {
+    case 'NotFoundError': return '找不到這個檔案，可能已被移動或刪除'
+    case 'NotAllowedError':
+    case 'SecurityError': return '沒有權限讀取或寫入這個位置'
+    case 'QuotaExceededError': return '磁碟空間不足'
+    case 'NoModificationAllowedError':
+    case 'InvalidModificationError': return '檔案正被其他程式使用中'
+    case 'NotReadableError': return '檔案讀不到，可能已損壞或在外接硬碟上被拔除'
+  }
+  return e instanceof Error ? e.message : String(e)
 }

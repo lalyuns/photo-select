@@ -28,6 +28,22 @@ export interface HistoryEntry {
   cursor: number
 }
 
+/** 上一次歸檔的結果，完成畫面用 */
+export interface ArchiveSummary {
+  /** 存到哪個資料夾（使用者選的那個） */
+  targetName: string
+  /** 每個分類資料夾複製了幾張 */
+  byFolder: Record<string, number>
+  copied: number
+  /** 沒有分類、所以沒複製的張數 */
+  skipped: number
+  failed: { name: string; reason: string }[]
+  /** 被使用者中途停止 */
+  stopped: boolean
+  /** 沒有真的寫檔（瀏覽器不支援時的示範模式） */
+  simulated: boolean
+}
+
 /** 整個 App 的狀態 */
 export interface AppState {
   screen: Screen
@@ -46,4 +62,5 @@ export interface AppState {
   history: HistoryEntry[]
   /** 目前看第幾張，從 0 開始 */
   cursor: number
+  lastArchive: ArchiveSummary | null
 }
