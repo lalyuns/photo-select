@@ -2,6 +2,7 @@
 // 負責：軌道 C。目前是佔位，只列出現有分類。
 import { Button } from '../components/ui/Button'
 import { Keycap } from '../components/ui/Keycap'
+import { formatUnsupported } from '../sources/fileNames'
 import { useAppStore } from '../store/useAppStore'
 import { Placeholder } from './Placeholder'
 
@@ -9,6 +10,8 @@ export function SetupScreen() {
   const categories = useAppStore((s) => s.categories)
   const photos = useAppStore((s) => s.photos)
   const sourceLabel = useAppStore((s) => s.sourceLabel)
+  const unsupported = useAppStore((s) => s.unsupported)
+  const skipped = formatUnsupported(unsupported)
   const goTo = useAppStore((s) => s.goTo)
 
   return (
@@ -23,7 +26,10 @@ export function SetupScreen() {
         </>
       }
     >
-      <p style={{ margin: 0 }}>已選「{sourceLabel}」，共 {photos.length} 張。</p>
+      <p style={{ margin: 0 }}>
+        已選「{sourceLabel}」，共 {photos.length} 張。
+        {skipped && `另有 ${skipped}暫不支援，已略過。`}
+      </p>
       <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 2 }}>
         {categories.map((c) => (
           <li key={c.id}>

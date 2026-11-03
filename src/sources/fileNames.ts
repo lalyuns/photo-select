@@ -61,3 +61,12 @@ export function uniqueName(name: string, taken: Set<string>): string {
   taken.add(candidate.toLowerCase())
   return candidate
 }
+
+/** 把不支援格式的統計變成一句話：{ heic: 3, raw: 4 } → 'HEIC 3 個、RAW 4 個' */
+export function formatUnsupported(unsupported: Record<string, number>): string {
+  const labels: Record<string, string> = { heic: 'HEIC', raw: 'RAW' }
+  return Object.entries(unsupported)
+    .filter(([, n]) => n > 0)
+    .map(([kind, n]) => `${labels[kind] ?? kind.toUpperCase()} ${n} 個`)
+    .join('、')
+}

@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { Button } from '../components/ui/Button'
 import { resolveKey } from '../config/keys'
-import { usePhotoUrl } from '../hooks/usePhotoUrl'
+import { usePhotoWindow } from '../hooks/usePhotoWindow'
 import { useAppStore } from '../store/useAppStore'
 import { Placeholder } from './Placeholder'
 
@@ -16,7 +16,7 @@ export function SortScreen() {
   const goTo = useAppStore((s) => s.goTo)
 
   const current = photos[cursor]
-  const { url, error } = usePhotoUrl(source, current?.id)
+  const { url, error } = usePhotoWindow(source, photos, cursor)
 
   // 鍵盤：按鍵 → resolveKey → store 動作
   useEffect(() => {

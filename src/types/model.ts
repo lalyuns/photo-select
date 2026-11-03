@@ -36,6 +36,8 @@ export interface AppState {
   /** 相冊名稱，顯示在左上角 */
   sourceLabel: string
   photos: PhotoEntry[]
+  /** 掃描時跳過的不支援格式，例如 { heic: 412, raw: 800 }（H6 的數據） */
+  unsupported: Record<string, number>
   categories: Category[]
   /** 照片 id → 分類 id；沒分過的照片不會出現在這裡 */
   assignments: Record<string, string>

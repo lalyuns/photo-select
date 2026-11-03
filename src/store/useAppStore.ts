@@ -16,7 +16,7 @@ const clamp = (n: number, max: number) => Math.max(0, Math.min(n, max))
 interface AppActions {
   goTo(screen: Screen): void
   /** 載入一批新照片，清空之前的分類與撤回紀錄 */
-  loadPhotos(source: PhotoSource, photos: PhotoEntry[]): void
+  loadPhotos(source: PhotoSource, photos: PhotoEntry[], unsupported?: Record<string, number>): void
   setCategories(categories: Category[]): void
   /** 把目前這張分到某類，並跳下一張 */
   assign(categoryId: string): void
@@ -35,6 +35,7 @@ export const useAppStore = create<AppState & AppActions>()((set, get) => ({
   source: null,
   sourceLabel: '',
   photos: [],
+  unsupported: {},
   categories: DEFAULT_CATEGORIES,
   assignments: {},
   history: [],
@@ -43,8 +44,8 @@ export const useAppStore = create<AppState & AppActions>()((set, get) => ({
   // ---- 動作 ----
   goTo: (screen) => set({ screen }),
 
-  loadPhotos: (source, photos) =>
-    set({ source, sourceLabel: source.label, photos, assignments: {}, history: [], cursor: 0 }),
+  loadPhotos: (source, photos, unsupported = {}) =>
+    set({ source, sourceLabel: source.label, photos, unsupported, assignments: {}, history: [], cursor: 0 }),
 
   setCategories: (categories) => set({ categories }),
 
